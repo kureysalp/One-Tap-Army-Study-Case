@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace OnaTapArmyCase.Army
+﻿namespace OneTapArmyCase.Army
 {
     public class WarriorUnit : Soldier
     {

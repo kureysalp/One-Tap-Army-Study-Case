@@ -6,4 +6,10 @@
         Moving,
         InCombat,
     }
+
+    public enum PlayerType
+    {
+        Human,
+        AI
+    }
 }

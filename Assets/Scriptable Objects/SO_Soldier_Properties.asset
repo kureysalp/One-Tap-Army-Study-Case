@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc48b195926d4af483647198ab69d49a, type: 3}
   m_Name: SO_Soldier_Properties
   m_EditorClassIdentifier: 
-  _maxHealth: 0
-  _attackPower: 0
-  _attackSpeed: 0
-  _movementSpeed: 0
-  _enemyDetectDistance: 0
-  _attackRange: 0
+  _maxHealth: 100
+  _attackPower: 10
+  _attackSpeed: 1
+  _movementSpeed: 5
+  _enemyDetectDistance: 4
+  _attackRange: 1

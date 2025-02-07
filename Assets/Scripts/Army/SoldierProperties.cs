@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace OnaTapArmyCase.Army
+namespace OneTapArmyCase.Army
 {
     [CreateAssetMenu(fileName = "SO_Soldier_Properties", menuName = "Scriptable Objects/Soldier Properties", order = 0)]
     public class SoldierProperties : ScriptableObject

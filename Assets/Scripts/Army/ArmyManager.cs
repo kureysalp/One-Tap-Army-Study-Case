@@ -2,13 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using OneTapArmyCase.Enums;
+using OneTapArmyCase.Game;
+using OneTapArmyCase.Player;
 using UnityEngine;
 
-namespace OnaTapArmyCase.Army
+namespace OneTapArmyCase.Army
 {
     public class ArmyManager : MonoBehaviour
     {
         [SerializeField] private float _armyIterationFrequencyInSeconds;
+        [SerializeField] private float _formationSpacing;
+        [SerializeField] private int _maxColumnSize;
+        
+        [SerializeField] PlayerType _playerType;
         
         public List<Soldier> _soldiers = new();
 
@@ -17,9 +23,26 @@ namespace OnaTapArmyCase.Army
             StartCoroutine(CO_IterateArmy());
         }
 
-        public void AddSoldier(Soldier soldier)
+        private void OnEnable()
+        {
+            if (_playerType == PlayerType.Human)
+                UserInput.OnPlayerTapMove += MoveArmy;
+
+            Castle.OnGenerateSoldier += AddSoldier;
+        }
+        
+        private void OnDisable()
+        {
+            if (_playerType == PlayerType.Human)
+                UserInput.OnPlayerTapMove -= MoveArmy;
+            
+            Castle.OnGenerateSoldier -= AddSoldier;
+        }
+
+        private void AddSoldier(Soldier soldier)
         {
             _soldiers.Add(soldier);
+            soldier.AssignToArmy(this);
         }
 
         private IEnumerator CO_IterateArmy()
@@ -44,15 +67,29 @@ namespace OnaTapArmyCase.Army
             }
         }
 
-        private void MoveArmy(Vector3 moveDestination)
+        private void MoveArmy(Vector3 targetDestination)
         {
-            foreach (var soldier in _soldiers)
+            for (var i = 0; i < _soldiers.Count; i++)
             {
+                var soldier = _soldiers[i];
                 if (soldier == null) continue;
                 if (soldier.SoldierState == SoldierState.InCombat) continue;
+
                 
-                soldier.Move(moveDestination);
+                var startPosition = targetDestination - _maxColumnSize/2 * _formationSpacing * Vector3.right; 
+                
+                var horizontalPosition = _formationSpacing * (i  % _maxColumnSize) * Vector3.right;
+                var columnIndex = i / _maxColumnSize;
+                var verticalPosition = _formationSpacing * columnIndex  * Vector3.back;
+                var nextSoldierDestination = startPosition + horizontalPosition + verticalPosition;
+                
+                soldier.Move(nextSoldierDestination);
             }
+        }
+
+        public void ReleaseSoldier(Soldier soldier)
+        {
+            _soldiers.Remove(soldier);
         }
     }
 }

@@ -1,10 +1,10 @@
-using System;
 using System.Collections;
 using OneTapArmyCase.Enums;
+using OneTapArmyCase.Game;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace OnaTapArmyCase.Army
+namespace OneTapArmyCase.Army
 {
     public class Soldier : MonoBehaviour
     {
@@ -29,6 +29,7 @@ namespace OnaTapArmyCase.Army
         private readonly Collider[] _enemyBuffer = new Collider[10];
 
         private Soldier _currentTarget;
+        private ArmyManager _currentArmy;
 
         public bool IsDead => _currentHealth <= 0;
         
@@ -40,6 +41,11 @@ namespace OnaTapArmyCase.Army
             SoldierSetup();
         }
 
+        public void AssignToArmy(ArmyManager army)
+        {
+            _currentArmy = army;
+        }
+
         private void SoldierSetup()
         {
             _currentHealth = _soldierProperties.MaxHealth;
@@ -48,18 +54,19 @@ namespace OnaTapArmyCase.Army
             _movementSpeed = _soldierProperties.MovementSpeed;
             _enemyDetectDistance = _soldierProperties.EnemyDetectDistance;
             _attackRange = _soldierProperties.AttackRange;
+
+            _soldierState = SoldierState.Idle;
         }
 
         public void Move(Vector3 destination)
         {
             _navMeshAgent.destination = destination;
-            _soldierState = SoldierState.Moving;
         }
 
         public void ApproachForAttacking(Soldier target)
         {
             _currentTarget = target;
-
+            _soldierState = SoldierState.InCombat;
             StartCoroutine(CO_AttackingEnemy());
         }
 
@@ -69,27 +76,17 @@ namespace OnaTapArmyCase.Army
             {
                 while (Vector3.Distance(transform.position, _currentTarget.transform.position) > _attackRange)
                 {
-                    var attackPosition = (transform.position - _currentTarget.transform.position).normalized * _attackRange;
+                    var attackPosition = _currentTarget.transform.position + (transform.position - _currentTarget.transform.position).normalized * _attackRange;
                     Move(attackPosition);
+                    yield return null;
                 }
-
                 _soldierState = SoldierState.InCombat;
-                Debug.Log("attacked to " + _currentTarget);
-            
+                
+                _currentTarget.GetHit(_attackPower);
+                
                 var nextAttackTime = 1 / _attackSpeed;
                 yield return new WaitForSeconds(nextAttackTime);
-                
-               // yield return null;
             }
-        }
-
-        private IEnumerator CO_Attack()
-        {
-            _soldierState = SoldierState.InCombat;
-            Debug.Log("attacked to " + _currentTarget);
-            
-            var nextAttackTime = 1 / _attackSpeed;
-            yield return new WaitForSeconds(nextAttackTime);
         }
 
         public Soldier CheckForEnemies()
@@ -100,6 +97,19 @@ namespace OnaTapArmyCase.Army
             
             InsertionSort(_enemyBuffer, enemyCount);
             return _enemyBuffer[0].GetComponent<Soldier>();
+        }
+
+        private void GetHit(float damage)
+        {
+            _currentHealth -= damage;
+
+            if (_currentHealth <= 0)
+                Die();
+        }
+
+        private void Die()
+        {
+            ObjectPooling.Instance.SoldierPool.Release(this);
         }
 
         private void InsertionSort(Collider[] array, int length)
