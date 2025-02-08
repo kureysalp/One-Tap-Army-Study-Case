@@ -28,7 +28,6 @@ namespace OneTapArmyCase.Army
             if (_playerType == PlayerType.Human)
                 UserInput.OnPlayerTapMove += MoveArmy;
 
-            Castle.OnGenerateSoldier += AddSoldier;
         }
         
         private void OnDisable()
@@ -36,10 +35,9 @@ namespace OneTapArmyCase.Army
             if (_playerType == PlayerType.Human)
                 UserInput.OnPlayerTapMove -= MoveArmy;
             
-            Castle.OnGenerateSoldier -= AddSoldier;
         }
 
-        private void AddSoldier(Soldier soldier)
+        public void AddSoldier(Soldier soldier)
         {
             _soldiers.Add(soldier);
             soldier.AssignToArmy(this);
@@ -47,6 +45,7 @@ namespace OneTapArmyCase.Army
 
         private IEnumerator CO_IterateArmy()
         {
+            if (_playerType == PlayerType.AI) yield break;
             while (true)
             {
                 for (var i = 0; i < _soldiers.Count; i++)

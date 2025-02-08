@@ -17,19 +17,23 @@ namespace OneTapArmyCase.Army
         protected float _currentHealth;
         protected float _attackPower;
         protected float _attackSpeed;
-        protected float _movementSpeed;
         protected float _enemyDetectDistance;
         protected float _attackRange;
 
         protected int _level;
         
         private NavMeshAgent _navMeshAgent;
-        public NavMeshAgent NavMeshAgent => _navMeshAgent;
         
         private readonly Collider[] _enemyBuffer = new Collider[10];
 
         private Soldier _currentTarget;
         private ArmyManager _currentArmy;
+        private Animator _animator;
+        
+        private static readonly int WalkAnimationString = Animator.StringToHash("Walk");
+        private static readonly int AttackAnimationString = Animator.StringToHash("Attack");
+        private static readonly int IdleAnimationString = Animator.StringToHash("Idle");
+
 
         public bool IsDead => _currentHealth <= 0;
         
@@ -51,15 +55,17 @@ namespace OneTapArmyCase.Army
             _currentHealth = _soldierProperties.MaxHealth;
             _attackPower = _soldierProperties.AttackPower;
             _attackSpeed = _soldierProperties.AttackSpeed;
-            _movementSpeed = _soldierProperties.MovementSpeed;
             _enemyDetectDistance = _soldierProperties.EnemyDetectDistance;
             _attackRange = _soldierProperties.AttackRange;
+
+            _navMeshAgent.speed = _soldierProperties.MovementSpeed;
 
             _soldierState = SoldierState.Idle;
         }
 
         public void Move(Vector3 destination)
         {
+            _animator.SetTrigger(WalkAnimationString);
             _navMeshAgent.destination = destination;
         }
 
@@ -81,19 +87,39 @@ namespace OneTapArmyCase.Army
                     yield return null;
                 }
                 _soldierState = SoldierState.InCombat;
-                
-                _currentTarget.GetHit(_attackPower);
-                
+
+                Attack();                
                 var nextAttackTime = 1 / _attackSpeed;
                 yield return new WaitForSeconds(nextAttackTime);
             }
+            
+            SetIdle();
+        }
+
+        private void SetIdle()
+        {
+            _soldierState = SoldierState.Idle;
+            _animator.SetTrigger(IdleAnimationString);
+        }
+
+        protected virtual void Attack()
+        {
+            _animator.SetTrigger(AttackAnimationString);
+        }
+
+        private void DealDamage()
+        {
+            _currentTarget.GetHit(_attackPower);
         }
 
         public Soldier CheckForEnemies()
         {
             var enemyCount = Physics.OverlapSphereNonAlloc(transform.position, _enemyDetectDistance, _enemyBuffer,_enemySoldierLayer);
             
-            if (enemyCount == 0) return null;
+            if (enemyCount == 0)
+            {
+                return null;
+            }
             
             InsertionSort(_enemyBuffer, enemyCount);
             return _enemyBuffer[0].GetComponent<Soldier>();
@@ -110,6 +136,7 @@ namespace OneTapArmyCase.Army
         private void Die()
         {
             ObjectPooling.Instance.SoldierPool.Release(this);
+            _currentArmy.ReleaseSoldier(this);
         }
 
         private void InsertionSort(Collider[] array, int length)

@@ -7,15 +7,14 @@ namespace OneTapArmyCase.Game
 {
     public class Castle : MonoBehaviour
     {
-        public static event Action<Soldier> OnGenerateSoldier;
-
         [SerializeField] private Transform _spawnPoint;
         
         private float _currentHealth;
         private float _currentExp;
 
         [SerializeField] private float _soldierGenerateRate;
-
+        [SerializeField] private ArmyManager _armyManager;
+        
         private Coroutine _soldierGenerateCoroutine;
         
         private void Start()
@@ -31,7 +30,7 @@ namespace OneTapArmyCase.Game
                 var soldier = ObjectPooling.Instance.SoldierPool.Get();
                 soldier.transform.position = _spawnPoint.position;
                 
-                OnGenerateSoldier?.Invoke(soldier);
+                _armyManager.AddSoldier(soldier);
                 
                 yield return new WaitForSeconds(1 / _soldierGenerateRate);
             }

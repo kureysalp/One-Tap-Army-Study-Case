@@ -8,13 +8,13 @@ namespace OneTapArmyCase.Game
     public class ObjectPooling : Singleton<ObjectPooling>
     {
         private ObjectPool<Soldier> _soldierPool;
-        public ObjectPool<Soldier> SoldierPool => _soldierPool;
+        public ObjectPool<Soldier>  SoldierPool => _soldierPool;
         
         [SerializeField] private Soldier _soldierPrefab;
         
         [SerializeField] private int _poolSize;
 
-        private void Start()
+        private void Awake()
         {
             _soldierPool = new ObjectPool<Soldier>(OnCreateSoldier, OnGetSoldier, OnReleaseSoldier,OnDestroySoldier,false,_poolSize);
         }
