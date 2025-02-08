@@ -18,3 +18,10 @@ MonoBehaviour:
   _movementSpeed: 6
   _enemyDetectDistance: 8
   _attackRange: 4
+  _soldierSprites:
+  - {fileID: 21300000, guid: dc6b1b4cefe4c2549933d465b8767e03, type: 3}
+  - {fileID: 21300000, guid: 831520374ab1a4f48b54865c2021ea66, type: 3}
+  - {fileID: 21300000, guid: c389f324ef3967a4fbd00d4a3c7b63d8, type: 3}
+  - {fileID: 21300000, guid: de0b23e626a106045911a5fdf1dfd6d0, type: 3}
+  - {fileID: 21300000, guid: a753f3d621e841146ae0e3db91c221be, type: 3}
+  _soldierType: 2

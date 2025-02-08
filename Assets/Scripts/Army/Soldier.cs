@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using OneTapArmyCase.Enums;
 using OneTapArmyCase.Game;
@@ -33,16 +34,24 @@ namespace OneTapArmyCase.Army
         private static readonly int WalkAnimationString = Animator.StringToHash("Walk");
         private static readonly int AttackAnimationString = Animator.StringToHash("Attack");
         private static readonly int IdleAnimationString = Animator.StringToHash("Idle");
+        
+        [SerializeField] private Renderer[] _renderers;
+        
+        private Coroutine _walkCoroutine;
 
 
         public bool IsDead => _currentHealth <= 0;
-        
+
+        private void Awake()
+        {
+            _animator = GetComponent<Animator>();
+        }
+
         private void OnEnable()
         {
             if(_navMeshAgent == null)
                 _navMeshAgent = GetComponent<NavMeshAgent>();
             
-            SoldierSetup();
         }
 
         public void AssignToArmy(ArmyManager army)
@@ -50,8 +59,25 @@ namespace OneTapArmyCase.Army
             _currentArmy = army;
         }
 
-        private void SoldierSetup()
+        public void SoldierSetup(PlayerType playerType, Material material)
         {
+            var playerLayer =  LayerMask.NameToLayer("Friend_Soldier");
+            var aiLayer =  LayerMask.NameToLayer("Enemy_Soldier");
+            switch (playerType)
+            {
+                case PlayerType.Human:
+                    gameObject.layer = playerLayer;
+                    _enemySoldierLayer = aiLayer;
+                break;
+                case PlayerType.AI:
+                    gameObject.layer = aiLayer;
+                    _enemySoldierLayer = playerLayer;
+                    break;
+            }
+
+            foreach (var meshRenderer in _renderers)
+                meshRenderer.materials[0] = material;
+            
             _currentHealth = _soldierProperties.MaxHealth;
             _attackPower = _soldierProperties.AttackPower;
             _attackSpeed = _soldierProperties.AttackSpeed;
@@ -67,6 +93,15 @@ namespace OneTapArmyCase.Army
         {
             _animator.SetTrigger(WalkAnimationString);
             _navMeshAgent.destination = destination;
+            /*if(_walkCoroutine != null)
+                StopCoroutine(_walkCoroutine);
+            _walkCoroutine= StartCoroutine(CO_CheckReachedDestination());*/
+        }
+
+        private void Update()
+        {
+            if(_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
+                SetIdle();
         }
 
         public void ApproachForAttacking(Soldier target)
@@ -93,6 +128,13 @@ namespace OneTapArmyCase.Army
                 yield return new WaitForSeconds(nextAttackTime);
             }
             
+            SetIdle();
+        }
+
+        private IEnumerator CO_CheckReachedDestination()
+        {
+            while(_navMeshAgent.remainingDistance > .1f)
+                yield return null;
             SetIdle();
         }
 

@@ -14,9 +14,10 @@ namespace OneTapArmyCase.Army
         [SerializeField] private float _formationSpacing;
         [SerializeField] private int _maxColumnSize;
         
-        [SerializeField] PlayerType _playerType;
+        [SerializeField] private PlayerType _playerType;
         
-        public List<Soldier> _soldiers = new();
+        private readonly List<Soldier> _soldiers = new();
+        public PlayerType PlayerType => _playerType;
 
         private void Start()
         {
@@ -74,11 +75,11 @@ namespace OneTapArmyCase.Army
                 if (soldier == null) continue;
                 if (soldier.SoldierState == SoldierState.InCombat) continue;
 
-                
-                var startPosition = targetDestination - _maxColumnSize/2 * _formationSpacing * Vector3.right; 
-                
-                var horizontalPosition = _formationSpacing * (i  % _maxColumnSize) * Vector3.right;
                 var columnIndex = i / _maxColumnSize;
+                var soldierPositionIndex = (_soldiers.Count % _maxColumnSize)  / 2;
+                
+                var startPosition = targetDestination - soldierPositionIndex * _formationSpacing * Vector3.right; 
+                var horizontalPosition = _formationSpacing * (i  % _maxColumnSize) * Vector3.right;
                 var verticalPosition = _formationSpacing * columnIndex  * Vector3.back;
                 var nextSoldierDestination = startPosition + horizontalPosition + verticalPosition;
                 

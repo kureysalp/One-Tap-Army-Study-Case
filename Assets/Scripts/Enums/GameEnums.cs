@@ -12,4 +12,20 @@
         Human,
         AI
     }
+
+    public enum SoldierType
+    {
+        Swordsman,
+        Warrior,
+        Archer,
+        Cavalry,
+        Giant
+    }
+
+    public enum GameState
+    {
+        Idle,
+        Playing,
+        End
+    }
 }
