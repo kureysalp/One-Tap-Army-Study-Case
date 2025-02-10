@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using HapticFeedback = CandyCoded.HapticFeedback.HapticFeedback;
 
 namespace OneTapArmyCase.Player
 {
@@ -8,7 +9,7 @@ namespace OneTapArmyCase.Player
         public static event Action<Vector3> OnPlayerTapMove;
 
         [SerializeField] private LayerMask _groundLayer;
-        
+
         private Camera _camera;
 
         private void Awake()
@@ -28,7 +29,10 @@ namespace OneTapArmyCase.Player
                 var ray = _camera.ScreenPointToRay(Input.mousePosition);
 
                 if (Physics.Raycast(ray, out var hit, _groundLayer))
+                {
                     OnPlayerTapMove?.Invoke(hit.point);
+                    HapticFeedback.MediumFeedback();
+                }
             }
         }
     }

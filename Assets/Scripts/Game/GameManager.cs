@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using OneTapArmyCase.Enums;
 using OneTapArmyCase.System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace OneTapArmyCase.Game
 {
@@ -9,8 +12,11 @@ namespace OneTapArmyCase.Game
     {
         private GameState _gameState;
         public GameState GameState => _gameState;
-        
-        public static event Action OnGameStart; 
+
+        [SerializeField] private GameObject _winScreen;
+        [SerializeField] private GameObject _loseScreen;
+
+        public static event Action OnGameStart;
 
         private void Start()
         {
@@ -33,17 +39,51 @@ namespace OneTapArmyCase.Game
         {
             ContinueTheGame();
         }
-        
+
         private void PauseTheGame()
         {
             _gameState = GameState.Idle;
             Time.timeScale = 0.0f;
         }
-        
+
         private void ContinueTheGame()
         {
             _gameState = GameState.Playing;
             Time.timeScale = 1.0f;
+        }
+
+        public void WinTheGame()
+        {
+            PauseTheGame();
+            _gameState = GameState.End;
+            _winScreen.SetActive(true);
+        }
+
+        public void LoseTheGame()
+        {
+            PauseTheGame();
+            _gameState = GameState.End;
+            _loseScreen.SetActive(true);
+        }
+
+        public void Restart()
+        {
+            if (_gameState != GameState.End) return;
+
+            _gameState = GameState.Idle;
+            StartCoroutine(LoadSceneAsync());
+        }
+
+        private IEnumerator LoadSceneAsync()
+        {
+            var sceneLoadProcess = SceneManager.LoadSceneAsync(0);
+
+            while (sceneLoadProcess is { isDone: false })
+            {
+                yield return null;
+            }
+
+            if (sceneLoadProcess != null) sceneLoadProcess.allowSceneActivation = true;
         }
     }
 }

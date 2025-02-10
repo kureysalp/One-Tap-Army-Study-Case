@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc48b195926d4af483647198ab69d49a, type: 3}
+  m_Name: SO_Giant_Properties
+  m_EditorClassIdentifier: 
+  _maxHealth: 120
+  _attackPower: 10
+  _attackSpeed: 0.6
+  _movementSpeed: 2
+  _enemyDetectDistance: 4
+  _attackRange: 1.2
+  _soldierSprites:
+  - {fileID: 21300000, guid: ec2cf5bf72a2d6546ae132bd121bd5ae, type: 3}
+  - {fileID: 21300000, guid: 001c19879bb56484f8ccfbdb47572cdf, type: 3}
+  - {fileID: 21300000, guid: 854563af21c27d841ae1a0321c5ef0e2, type: 3}
+  - {fileID: 21300000, guid: c83943c9f20e0fb41a63dacdc508a945, type: 3}
+  - {fileID: 21300000, guid: d21ef5167f2529e4f850f6cc88e701a1, type: 3}
+  _soldierName: {fileID: 21300000, guid: 570da951fbd86b840bf6689bd8bd8fc6, type: 3}
+  _soldierCardBg: {fileID: 21300000, guid: 61ad193c744fb5f45a2f247fd7e3476c, type: 3}
+  _soldierType: 4
